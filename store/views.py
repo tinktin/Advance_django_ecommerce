@@ -55,4 +55,4 @@ def search(request):
     return render(request,'store/store.html',context)
 
 
-# 10 hr 20 min
+# 10 hr 30 min
