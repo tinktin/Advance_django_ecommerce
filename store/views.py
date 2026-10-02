@@ -55,4 +55,5 @@ def search(request):
     return render(request,'store/store.html',context)
 
 
-# 10 hr 30 min
+
+# by video -2 - 1 hr 57 min
