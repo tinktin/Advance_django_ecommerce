@@ -98,3 +98,4 @@ def submit_review(request,product_id):
                 return redirect(url)
 
 
+# by video-2 6 hr
