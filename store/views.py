@@ -101,5 +101,5 @@ def submit_review(request,product_id):
                 return redirect(url)
 
 
-# 6 hr 36 min
+# 7 hr
 
