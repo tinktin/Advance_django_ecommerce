@@ -32,7 +32,10 @@ def register(request):
             username = email.split('@')[0]
             user = Account.objects.create_user(first_name=first_name,last_name=last_name,username=username,email=email,password=password)
             user.phone_number = phone_number
+            user.is_active = True
             user.save()
+            # Create profile without a picture
+            UserProfile.objects.create(user=user)
 
             # USER ACTIVATION
             current_site = get_current_site(request)
@@ -49,6 +52,7 @@ def register(request):
             send_email.send()
             #messages.success(request, 'Thamk you for regitering with us.we have sent you a verification email to your email address.Please verify it.')
             return redirect('/accounts/login/?command=verification&email='+email)
+        
     else:      
         form = RegistrationForm()
     context = {
@@ -128,7 +132,7 @@ def logout(request):
 def activate(request,uidb64,token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
-        user = Account._default_manager(pk=uid)
+        user = Account._default_manager.get(pk=uid)
     except(TypeError,ValueError,OverflowError,Account.DoesNotExist):
         user = None
     if user is not None and default_token_generator.check_token(user,token):
@@ -146,7 +150,10 @@ def dashboard(request):
     orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id,is_ordered=True)
     orders_count = orders.count()
 
-    userprofile = UserProfile.objects.get(user_id=request.user.id)
+    #userprofile = UserProfile.objects.get(user_id=request.user.id)
+    userprofile, created = UserProfile.objects.get_or_create(
+        user_id=request.user.id
+    )
     context = {
         'orders_count':orders_count,
         'userprofile':userprofile,
@@ -158,7 +165,7 @@ def dashboard(request):
 def forgotPassword(request):
     if request.method == 'POST':
         email = request.POST['email']
-        if Account.objects.filter(email=email).exist():
+        if Account.objects.filter(email=email).exists():
             user = Account.objects.get(email__exact=email)
 
             # Reset password email
@@ -185,7 +192,7 @@ def forgotPassword(request):
 def resetpassword_validate(request,uidb64,token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
-        user = Account._default_manager(pk=uid)
+        user = Account._default_manager.get(pk=uid)
     except(TypeError,ValueError,OverflowError,Account.DoesNotExist):
         user = None
     if user is not None and default_token_generator.check_token(user,token):

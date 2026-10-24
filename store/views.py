@@ -14,7 +14,8 @@ def store(request,category_slug=None):
     products = None
     if category_slug != None:
         categories = get_object_or_404(Category,slug=category_slug)
-        products = get_object_or_404(Product,is_available=True)
+        # products = get_object_or_404(Product,is_available=True)
+        products = Product.objects.filter(is_available=True)
         paginator = Paginator(products,1)
         page = request.GET.get('page')
         paged_products = paginator.get_page(page)
@@ -101,5 +102,5 @@ def submit_review(request,product_id):
                 return redirect(url)
 
 
-# 7 hr
+# only deployment left
 
